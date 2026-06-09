@@ -1,0 +1,28 @@
+---
+# Install Consul from the official HashiCorp APT repository.
+# The repository supports Debian bullseye/bookworm/trixie and the package provides
+# the binary (/usr/bin/consul), the consul user/group, /opt/consul, /etc/consul.d
+# and the consul.service systemd unit.
+
+- name: Add HashiCorp GPG key
+  ansible.builtin.get_url:
+    url: https://apt.releases.hashicorp.com/gpg
+    dest: /usr/share/keyrings/hashicorp-archive-keyring.asc
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Add HashiCorp apt repository
+  ansible.builtin.apt_repository:
+    repo: >-
+      deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.asc]
+      https://apt.releases.hashicorp.com {{ ansible_distribution_release }} main
+    filename: hashicorp
+    state: present
+    update_cache: true
+
+- name: Install consul
+  ansible.builtin.apt:
+    name: "consul{{ ('=' + consul_version ) if consul_version else '' }}"
+    state: "{{ 'latest' if (consul_install_upgrade | bool and not consul_version) else 'present' }}"
+    allow_downgrade: true

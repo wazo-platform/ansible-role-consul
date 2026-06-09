@@ -1,0 +1,17 @@
+---
+# Install and configure dnsmasq to forward the consul domain to the local
+# consul DNS interface. Only used when systemd-resolved is not available.
+
+- name: Install dnsmasq
+  ansible.builtin.package:
+    name: dnsmasq
+    state: present
+
+- name: Configure dnsmasq for consul
+  ansible.builtin.template:
+    src: dnsmasq-10-consul.j2
+    dest: /etc/dnsmasq.d/10-consul
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart dnsmasq

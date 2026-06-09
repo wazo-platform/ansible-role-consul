@@ -1,0 +1,49 @@
+---
+# defaults file for ansible-role-consul
+
+consul_enabled: true
+
+consul_version: ""                 # "" = latest from the repo; e.g. "1.20.5" pins it
+consul_install_upgrade: false      # upgrade the package on each run (only when consul_version is unset)
+consul_config_dir: /etc/consul.d   # apt-standard
+consul_data_path: /opt/consul      # package default
+consul_run_path: /run/consul       # TODO remove once all env rely on the apt package unit
+consul_user: consul
+consul_group: bin                  # match the group used for consul.d files
+
+consul_datacenter: "{{ metadata_owner }}-{{ metadata_environment }}"
+consul_domain: "{{ metadata_environment }}.{{ metadata_owner }}"
+consul_disable_update_check: true
+consul_ui: true
+consul_log_level: INFO
+
+# Server / cluster role
+consul_node_role: server                  # server | bootstrap | client
+consul_bootstrap_expect: true             # emit bootstrap_expect (ignored for the bootstrap role)
+# Expected server count. Leave empty to compute it from the number of server
+# nodes in the `all` inventory group (brianshumate.consul semantics); set an
+# integer to override.
+consul_bootstrap_expect_value: ""
+
+consul_bind_address: "{{ ansible_default_ipv4.address }}"
+consul_advertise_address: "{{ consul_bind_address }}"
+consul_advertise_address_wan: ""          # set to advertise a WAN address
+consul_client_address: 0.0.0.0
+consul_ports:
+  dns: 8600
+  http: 8500
+
+# Cluster join
+consul_retry_interval: 30s
+consul_retry_max: 0
+consul_join: []                           # static LAN peers (used when cloud autodiscovery is off)
+consul_join_wan: []                       # static WAN peers
+consul_cloud_autodiscovery: false
+consul_cloud_autodiscovery_string: ""     # e.g. "provider=aws tag_key=Service tag_value=consul addr_type=private_v4"
+
+consul_dnsmasq_consul_address: 127.0.0.1
+consul_dnsmasq_servers:
+  - 169.254.169.253
+  - 9.9.9.9
+consul_dnsmasq_bind_interfaces: true
+consul_dnsmasq_listen_addresses: ["127.0.0.1"]

@@ -1,0 +1,45 @@
+# !!! MANAGED BY ANSIBLE !!!
+datacenter = "{{ consul_datacenter }}"
+domain     = "{{ consul_domain }}"
+data_dir   = "{{ consul_data_path }}"
+
+server = {{ (consul_node_role != 'client') | bool | ternary('true', 'false') }}
+{% if consul_node_role == 'bootstrap' %}
+bootstrap = true
+{% elif consul_bootstrap_expect | bool %}
+{# Count server-role hosts in the `all` inventory group (brianshumate semantics). #}
+{# Hosts without an explicit consul_node_role inherit the role default (server). #}
+{% set _servers = groups['all'] | map('extract', hostvars) | map(attribute='consul_node_role', default='server') | select('in', ['server', 'bootstrap']) | list %}
+{% set _expect = consul_bootstrap_expect_value | default('', true) or (_servers | length) %}
+bootstrap_expect = {{ _expect }}
+{% endif %}
+
+bind_addr      = "{{ consul_bind_address }}"
+advertise_addr = "{{ consul_advertise_address }}"
+{% if consul_advertise_address_wan %}
+advertise_addr_wan = "{{ consul_advertise_address_wan }}"
+{% endif %}
+client_addr    = "{{ consul_client_address }}"
+
+ports {
+  dns  = {{ consul_ports.dns }}
+  http = {{ consul_ports.http }}
+}
+
+log_level = "{{ consul_log_level }}"
+disable_update_check = {{ consul_disable_update_check | bool | ternary('true', 'false') }}
+
+ui_config {
+  enabled = {{ consul_ui | bool | ternary('true', 'false') }}
+}
+
+retry_interval = "{{ consul_retry_interval }}"
+retry_max      = {{ consul_retry_max | int }}
+{% if consul_cloud_autodiscovery | bool %}
+retry_join = ["{{ consul_cloud_autodiscovery_string }}"]
+{% elif consul_join | length > 0 %}
+retry_join = {{ consul_join | to_json }}
+{% endif %}
+{% if consul_join_wan | length > 0 %}
+retry_join_wan = {{ consul_join_wan | to_json }}
+{% endif %}

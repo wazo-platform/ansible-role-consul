@@ -1,0 +1,36 @@
+---
+repos:
+  - repo: https://github.com/PyCQA/flake8
+    rev: 7.3.0
+    hooks:
+      - id: flake8
+  - repo: https://github.com/psf/black
+    rev: 25.11.0
+    hooks:
+      - id: black
+  - repo: https://github.com/asottile/pyupgrade
+    rev: v3.21.1
+    hooks:
+      - id: pyupgrade
+        args: [--py311-plus]
+  - repo: https://github.com/pycqa/isort
+    rev: 7.0.0
+    hooks:
+      - id: isort
+        args: [--filter-files]
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: check-added-large-files
+      - id: check-yaml
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+  - repo: https://github.com/wazo-platform/wazo-git-hooks
+    rev: 1.1.5
+    hooks:
+      - id: wazo-copyright-check
+  - repo: https://github.com/ansible-community/ansible-lint.git
+    rev: v26.4.0
+    hooks:
+      - id: ansible-lint
+        language_version: python3

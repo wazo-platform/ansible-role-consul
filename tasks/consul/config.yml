@@ -1,0 +1,69 @@
+---
+# Configure the Consul node and its DNS integration.
+
+- name: Gather service facts
+  ansible.builtin.service_facts:
+
+- name: Detect systemd-resolved
+  ansible.builtin.set_fact:
+    has_systemd_resolved: >-
+      {{
+        'systemd-resolved.service' in ansible_facts.services
+        and ansible_facts.services['systemd-resolved.service'].state == 'running'
+      }}
+
+- name: Configure consul
+  ansible.builtin.template:
+    src: consul.hcl.j2
+    dest: "{{ consul_config_dir }}/consul.hcl"
+    owner: "{{ consul_user }}"
+    group: "{{ consul_group }}"
+    mode: "0640"
+  notify: Restart consul
+
+- name: Create consul.service systemd override directory
+  ansible.builtin.file:
+    path: /etc/systemd/system/consul.service.d
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+# The HashiCorp apt package ships the unit with Type=notify, which fails to
+# reach "ready" (and times out) when starting a single node. Force Type=simple.
+- name: Override consul service type to simple
+  ansible.builtin.copy:
+    dest: /etc/systemd/system/consul.service.d/override.conf
+    content: |
+      # !!! MANAGED BY ANSIBLE !!!
+      [Service]
+      Type=simple
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart consul
+
+# DNS integration: forward the consul domain to the local consul DNS interface.
+# Prefer systemd-resolved when it is running; otherwise fall back to dnsmasq.
+- name: Create systemd-resolved configuration subfolder
+  ansible.builtin.file:
+    path: /etc/systemd/resolved.conf.d
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+  when: has_systemd_resolved | bool
+
+- name: Configure systemd-resolved to use the consul DNS server
+  ansible.builtin.template:
+    src: resolved-consul.conf.j2
+    dest: /etc/systemd/resolved.conf.d/10-consul.conf
+    owner: root
+    group: root
+    mode: "0644"
+  when: has_systemd_resolved | bool
+  notify: Restart systemd-resolved
+
+- name: Setup dnsmasq for consul
+  ansible.builtin.include_tasks: dnsmasq.yml
+  when: not (has_systemd_resolved | bool)
