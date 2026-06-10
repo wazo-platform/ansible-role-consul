@@ -16,13 +16,13 @@
   ansible.builtin.apt_repository:
     repo: >-
       deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.asc]
-      https://apt.releases.hashicorp.com {{ ansible_distribution_release }} main
+      https://apt.releases.hashicorp.com {{ ansible_facts['distribution_release'] }} main
     filename: hashicorp
     state: present
     update_cache: true
 
 - name: Install consul
   ansible.builtin.apt:
-    name: "consul{{ ('=' + consul_version ) if consul_version else '' }}"
+    name: "consul{{ ('=' + consul_version) if consul_version else '' }}"
     state: "{{ 'latest' if (consul_install_upgrade | bool and not consul_version) else 'present' }}"
     allow_downgrade: true

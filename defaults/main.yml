@@ -25,7 +25,7 @@ consul_bootstrap_expect: true             # emit bootstrap_expect (ignored for t
 # integer to override.
 consul_bootstrap_expect_value: ""
 
-consul_bind_address: "{{ ansible_default_ipv4.address }}"
+consul_bind_address: "{{ ansible_facts['default_ipv4']['address'] }}"
 consul_advertise_address: "{{ consul_bind_address }}"
 consul_advertise_address_wan: ""          # set to advertise a WAN address
 consul_client_address: 0.0.0.0
