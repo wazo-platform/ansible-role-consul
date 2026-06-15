@@ -29,3 +29,7 @@
     owner: root
     group: root
     mode: "0644"
+    # /etc/resolv.conf is a bind mount inside containers (and often a managed
+    # symlink on real hosts), so the default atomic rename fails with EBUSY.
+    # Write in place instead.
+    unsafe_writes: true
