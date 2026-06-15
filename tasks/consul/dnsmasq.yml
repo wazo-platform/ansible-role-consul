@@ -15,3 +15,17 @@
     group: root
     mode: "0644"
   notify: Restart dnsmasq
+
+# Point the host libc resolver at dnsmasq. Without this, /etc/resolv.conf still
+# lists the DHCP/upstream nameserver and glibc lookups bypass dnsmasq entirely,
+# so consul domain forwarding never runs.
+- name: Point the system resolver at dnsmasq
+  ansible.builtin.lineinfile:
+    path: /etc/resolv.conf
+    regexp: ^nameserver 127.0.0.1
+    line: nameserver 127.0.0.1
+    insertbefore: BOF
+    create: true
+    owner: root
+    group: root
+    mode: "0644"
