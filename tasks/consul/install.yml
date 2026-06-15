@@ -26,3 +26,4 @@
     name: "consul{{ ('=' + consul_version) if consul_version else '' }}"
     state: "{{ 'latest' if (consul_install_upgrade | bool and not consul_version) else 'present' }}"
     allow_downgrade: true
+  notify: Restart consul
