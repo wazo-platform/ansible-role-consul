@@ -4,6 +4,10 @@ server=/{{ consul_domain }}/{{ consul_dnsmasq_consul_address }}#{{ consul_ports.
 {% if consul_dnsmasq_bind_interfaces | bool %}
 bind-interfaces
 {% endif %}
+# /etc/resolv.conf now points only at dnsmasq itself, so don't read it for
+# upstream servers (that would forward to ourselves). Use the explicit servers
+# below instead.
+no-resolv
 {% for upstream in consul_dnsmasq_servers %}
 server={{ upstream }}
 {% endfor %}

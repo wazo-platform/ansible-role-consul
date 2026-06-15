@@ -16,9 +16,17 @@
     mode: "0644"
   notify: Restart dnsmasq
 
-# Point the host libc resolver at dnsmasq. Without this, /etc/resolv.conf still
-# lists the DHCP/upstream nameserver and glibc lookups bypass dnsmasq entirely,
-# so consul domain forwarding never runs.
+- name: Check how /etc/resolv.conf is managed
+  ansible.builtin.stat:
+    path: /etc/resolv.conf
+  register: consul_resolv_conf
+
+- name: Detach /etc/resolv.conf from its managing service
+  ansible.builtin.file:
+    path: /etc/resolv.conf
+    state: absent
+  when: consul_resolv_conf.stat.islnk | default(false)
+
 - name: Point the system resolver at dnsmasq
   ansible.builtin.lineinfile:
     path: /etc/resolv.conf
@@ -29,7 +37,7 @@
     owner: root
     group: root
     mode: "0644"
-    # /etc/resolv.conf is a bind mount inside containers (and often a managed
-    # symlink on real hosts), so the default atomic rename fails with EBUSY.
-    # Write in place instead.
+    # /etc/resolv.conf is a bind mount inside containers, so the default atomic
+    # rename fails with EBUSY. Write in place instead. (The symlink case above
+    # has already been replaced with a regular file.)
     unsafe_writes: true
