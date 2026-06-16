@@ -19,12 +19,42 @@ advertise_addr = "{{ consul_advertise_address }}"
 {% if consul_advertise_address_wan %}
 advertise_addr_wan = "{{ consul_advertise_address_wan }}"
 {% endif %}
+translate_wan_addrs = {{ consul_translate_wan_address | bool | ternary('true', 'false') }}
 client_addr    = "{{ consul_client_address }}"
 
-ports {
-  dns  = {{ consul_ports.dns }}
-  http = {{ consul_ports.http }}
+addresses {
+  dns   = "{{ consul_addresses.dns }}"
+  grpc  = "{{ consul_addresses.grpc }}"
+  http  = "{{ consul_addresses.http }}"
+  https = "{{ consul_addresses.https }}"
 }
+
+ports {
+  dns      = {{ consul_ports.dns }}
+  http     = {{ consul_ports.http }}
+  https    = {{ consul_ports.https }}
+  grpc     = {{ consul_ports.grpc }}
+  serf_lan = {{ consul_ports.serf_lan }}
+  serf_wan = {{ consul_ports.serf_wan }}
+  server   = {{ consul_ports.server }}
+}
+
+raft_protocol = {{ consul_raft_protocol | int }}
+
+performance {
+  leave_drain_time = "{{ consul_performance.leave_drain_time }}"
+  raft_multiplier  = {{ consul_performance.raft_multiplier | int }}
+  rpc_hold_timeout = "{{ consul_performance.rpc_hold_timeout }}"
+}
+
+{% if consul_encrypt_enable | bool %}
+encrypt                 = "{{ consul_raw_key }}"
+encrypt_verify_incoming = {{ consul_encrypt_verify_incoming | bool | ternary('true', 'false') }}
+encrypt_verify_outgoing = {{ consul_encrypt_verify_outgoing | bool | ternary('true', 'false') }}
+{% endif %}
+
+enable_script_checks       = {{ consul_enable_script_checks | bool | ternary('true', 'false') }}
+enable_local_script_checks = {{ consul_enable_local_script_checks | bool | ternary('true', 'false') }}
 
 log_level = "{{ consul_log_level }}"
 disable_update_check = {{ consul_disable_update_check | bool | ternary('true', 'false') }}
@@ -33,8 +63,10 @@ ui_config {
   enabled = {{ consul_ui | bool | ternary('true', 'false') }}
 }
 
-retry_interval = "{{ consul_retry_interval }}"
-retry_max      = {{ consul_retry_max | int }}
+retry_interval     = "{{ consul_retry_interval }}"
+retry_interval_wan = "{{ consul_retry_interval_wan }}"
+retry_max          = {{ consul_retry_max | int }}
+retry_max_wan      = {{ consul_retry_max_wan | int }}
 {% if consul_cloud_autodiscovery | bool %}
 retry_join = ["{{ consul_cloud_autodiscovery_string }}"]
 {% elif consul_join | length > 0 %}

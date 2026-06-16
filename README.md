@@ -66,9 +66,20 @@ See [defaults/main.yml](defaults/main.yml) for the full list. Key variables:
 | `consul_bootstrap_expect_value` | `""` | Expected server count. Empty = computed from the number of server nodes in the `all` inventory group. |
 | `consul_bind_address` | `"{{ ansible_default_ipv4.address }}"` | Bind address. |
 | `consul_advertise_address_wan` | `""` | WAN advertise address (servers). |
+| `consul_translate_wan_address` | `false` | Prefer WAN addresses when translating between datacenters. |
 | `consul_client_address` | `0.0.0.0` | Client (API/DNS) bind address. |
+| `consul_addresses` | `{dns,grpc,http,https: 0.0.0.0}` | Per-API bind interfaces. |
+| `consul_ports` | `{dns: 8600, http: 8500, https/grpc: -1, serf_lan: 8301, serf_wan: 8302, server: 8300}` | Listener ports (`-1` disables). |
+| `consul_raft_protocol` | `3` | Raft protocol version. |
+| `consul_performance` | `{leave_drain_time: 5s, raft_multiplier: 1, rpc_hold_timeout: 7s}` | Performance tuning block. |
+| `consul_enable_script_checks` | `false` | Allow script health checks. |
+| `consul_enable_local_script_checks` | `false` | Allow local script health checks. |
+| `consul_encrypt_enable` | `true` | Enable gossip encryption (set `consul_raw_key`). |
+| `consul_raw_key` | `""` | Gossip encryption key (`consul keygen`); supply via vault. |
 | `consul_join` | `[]` | Static LAN peers (used when cloud autodiscovery is off). |
 | `consul_join_wan` | `[]` | Static WAN peers. |
+| `consul_retry_interval` | `30s` | LAN re-join interval. |
+| `consul_retry_max` | `0` | Max LAN join attempts (`0` = infinite). |
 | `consul_cloud_autodiscovery` | `false` | Use a cloud `retry_join` string instead of static peers. |
 | `consul_cloud_autodiscovery_string` | `""` | e.g. `provider=aws tag_key=Service tag_value=consul addr_type=private_v4`. |
 | `consul_dnsmasq_servers` | `[169.254.169.253, 9.9.9.9]` | Upstream DNS servers for dnsmasq (only used on the dnsmasq path). |
