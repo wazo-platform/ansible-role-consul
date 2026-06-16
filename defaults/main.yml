@@ -56,7 +56,7 @@ consul_enable_script_checks: false
 consul_enable_local_script_checks: false
 
 # Gossip encryption (supply consul_raw_key via vault to enable)
-consul_encrypt_enable: true
+consul_encrypt_enable: false
 consul_raw_key: ""                        # `consul keygen` output
 consul_encrypt_verify_incoming: true
 consul_encrypt_verify_outgoing: true
