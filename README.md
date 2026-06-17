@@ -82,7 +82,7 @@ See [defaults/main.yml](defaults/main.yml) for the full list. Key variables:
 | `consul_retry_max` | `0` | Max LAN join attempts (`0` = infinite). |
 | `consul_cloud_autodiscovery` | `false` | Use a cloud `retry_join` string instead of static peers. |
 | `consul_cloud_autodiscovery_string` | `""` | e.g. `provider=aws tag_key=Service tag_value=consul addr_type=private_v4`. |
-| `consul_dnsmasq_servers` | `[169.254.169.253, 9.9.9.9]` | Upstream DNS servers for dnsmasq (only used on the dnsmasq path). |
+| `consul_dnsmasq_servers` | `[]` | Upstream DNS servers for dnsmasq (only used on the dnsmasq path). |
 
 > **Note on `bootstrap_expect`:** with `consul_bootstrap_expect: true` and an
 > empty `consul_bootstrap_expect_value`, the role counts the server-role hosts in
