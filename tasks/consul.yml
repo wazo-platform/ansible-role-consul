@@ -1,0 +1,32 @@
+---
+- name: Install consul
+  ansible.builtin.include_tasks: consul/install.yml
+
+- name: Configure consul
+  ansible.builtin.include_tasks: consul/config.yml
+
+- name: Ensure consul is started and enabled
+  ansible.builtin.systemd:
+    name: consul
+    state: started
+    enabled: true
+    daemon_reload: true
+
+- name: Apply pending consul restart before readiness check
+  ansible.builtin.meta: flush_handlers
+
+- name: Wait for consul HTTP API port
+  ansible.builtin.wait_for:
+    host: 127.0.0.1
+    port: "{{ consul_ports.http }}"
+    timeout: 60
+
+- name: Wait for consul leader election
+  ansible.builtin.uri:
+    url: "http://127.0.0.1:{{ consul_ports.http }}/v1/status/leader"
+    return_content: true
+  register: consul_leader
+  until: consul_leader.content | length > 2
+  retries: 30
+  delay: 2
+  changed_when: false

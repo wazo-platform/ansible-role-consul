@@ -1,0 +1,21 @@
+---
+galaxy_info:
+  role_name: consul
+  namespace: wazo
+  author: "Wazo Developers"
+  description: "Install and configure HashiCorp Consul (server or agent)"
+  company: "Wazo"
+  license: "MIT"
+  min_ansible_version: '1.8'
+  platforms:
+    - name: Debian
+      versions:
+        - bullseye
+        - bookworm
+        - trixie
+  galaxy_tags:
+    - system
+dependencies:
+  - src: git@github.com:wazo-platform/ansible-role-metadata.git
+    scm: git
+    name: wazo.metadata

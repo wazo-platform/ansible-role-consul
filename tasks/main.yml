@@ -1,0 +1,20 @@
+---
+# tasks file for ansible-role-consul
+
+- name: Update apt cache
+  ansible.builtin.apt:
+    update_cache: yes
+  tags: molecule-idempotence-notest
+
+- name: Install requirements
+  ansible.builtin.package:
+    name:
+      - jq
+      - ca-certificates
+      - gnupg
+    state: present
+
+- name: Consul setup
+  ansible.builtin.include_tasks: consul.yml
+  when: consul_enabled
+  tags: consul

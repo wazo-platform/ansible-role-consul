@@ -1,0 +1,95 @@
+---
+# The DNS resolver path to exercise is chosen by the CONSUL_DNS_RESOLVER env
+# var ("dnsmasq" or "systemd-resolved", the default):
+#   - systemd-resolved: install and start resolved so the role configures it
+#   - dnsmasq: mask resolved so the role falls back to dnsmasq
+- name: Prepare
+  hosts: all
+  become: yes
+
+  vars:
+    _resolver: "{{ lookup('env', 'CONSUL_DNS_RESOLVER') | default('systemd-resolved', true) }}"
+
+  tasks:
+  - name: Set apt retries for debian <=12
+    ansible.builtin.copy:
+      dest: /etc/apt/apt.conf.d/99-retries.conf
+      content: |
+        Acquire::Retries "5";
+      owner: root
+      group: root
+      mode: "0644"
+    when:
+      - ansible_facts['distribution'] == "Debian"
+      - ansible_facts['distribution_major_version'] | int <= 12
+
+  - name: Set up the systemd-resolved path
+    when: _resolver != 'dnsmasq'
+    # In a Docker container there is no network manager to feed upstream DNS to
+    # systemd-resolved, and installing it switches nsswitch to nss-resolve first.
+    # Without an upstream, resolved answers nothing and every lookup fails (the
+    # role then breaks at "Add HashiCorp GPG key"). Capture the container's
+    # current nameservers and hand them to resolved as its global DNS so general
+    # resolution keeps working. This is a container quirk; a real host gets these
+    # from its network manager.
+    block:
+      - name: Read the container's resolv.conf
+        ansible.builtin.slurp:
+          src: /etc/resolv.conf
+        register: _resolv_conf
+
+      - name: Extract upstream nameservers
+        ansible.builtin.set_fact:
+          _upstream_nameservers: >-
+            {{
+              (_resolv_conf.content | b64decode).splitlines()
+              | select('match', '^nameserver\s')
+              | map('regex_replace', '^nameserver\s+', '')
+              | list
+            }}
+
+      - name: Install systemd-resolved
+        ansible.builtin.apt:
+          name: systemd-resolved
+          state: present
+          update_cache: true
+        when: ansible_facts['distribution_major_version'] | int >= 12
+
+      - name: Create systemd-resolved configuration subfolder
+        ansible.builtin.file:
+          path: /etc/systemd/resolved.conf.d
+          state: directory
+          owner: root
+          group: root
+          mode: "0755"
+
+      # Sorts before the role's 10-consul.conf; DNS= lines accumulate across
+      # drop-ins, so the upstream is tried first for general queries.
+      - name: Give systemd-resolved a working upstream
+        ansible.builtin.copy:
+          dest: /etc/systemd/resolved.conf.d/00-molecule-upstream.conf
+          content: |
+            [Resolve]
+            DNS={{ _upstream_nameservers | join(' ') }}
+          owner: root
+          group: root
+          mode: "0644"
+        when: _upstream_nameservers | length > 0
+
+      - name: Ensure systemd-resolved is running with the upstream applied
+        ansible.builtin.systemd:
+          name: systemd-resolved
+          state: restarted
+          enabled: true
+          masked: false
+
+  - name: Set up the dnsmasq path
+    when: _resolver == 'dnsmasq'
+    # Ensure systemd-resolved is not running (and cannot start) so the role
+    # detects it as absent and falls back to dnsmasq.
+    ansible.builtin.systemd:
+      name: systemd-resolved
+      state: stopped
+      enabled: false
+      masked: true
+    failed_when: false
