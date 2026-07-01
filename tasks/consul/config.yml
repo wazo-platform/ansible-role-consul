@@ -64,6 +64,14 @@
   when: has_systemd_resolved | bool
   notify: Restart systemd-resolved
 
+- name: Ensure resolv.conf uses the systemd-resolved stub (enables split-DNS for all clients)
+  ansible.builtin.file:
+    src: /run/systemd/resolve/stub-resolv.conf
+    dest: /etc/resolv.conf
+    state: link
+    force: true
+  when: has_systemd_resolved | bool
+
 - name: Setup dnsmasq for consul
   ansible.builtin.include_tasks: dnsmasq.yml
   when: not (has_systemd_resolved | bool)
