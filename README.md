@@ -82,6 +82,8 @@ See [defaults/main.yml](defaults/main.yml) for the full list. Key variables:
 | `consul_retry_max` | `0` | Max LAN join attempts (`0` = infinite). |
 | `consul_cloud_autodiscovery` | `false` | Use a cloud `retry_join` string instead of static peers. |
 | `consul_cloud_autodiscovery_string` | `""` | e.g. `provider=aws tag_key=Service tag_value=consul addr_type=private_v4`. |
+| `consul_telemetry_enabled` | `false` | Render a dedicated `telemetry.hcl` with a `telemetry {}` block. |
+| `consul_telemetry` | `{disable_hostname: true, prometheus_retention_time: 60s}` | Key/values passed through to the `telemetry {}` block. |
 | `consul_dnsmasq_servers` | `[]` | Upstream DNS servers for dnsmasq (only used on the dnsmasq path). |
 
 > **Note on `bootstrap_expect`:** with `consul_bootstrap_expect: true` and an
