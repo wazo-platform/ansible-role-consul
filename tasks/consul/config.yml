@@ -64,13 +64,24 @@
   when: has_systemd_resolved | bool
   notify: Restart systemd-resolved
 
+# In containers (e.g. Docker/molecule) /etc/resolv.conf is a bind mount and
+# cannot be replaced by a symlink, so skip the link there.
+- name: Check whether /etc/resolv.conf is a bind mount
+  ansible.builtin.command: mountpoint -q /etc/resolv.conf
+  register: _resolv_conf_mountpoint
+  changed_when: false
+  failed_when: false
+  when: has_systemd_resolved | bool
+
 - name: Ensure resolv.conf uses the systemd-resolved stub (enables split-DNS for all clients)
   ansible.builtin.file:
     src: /run/systemd/resolve/stub-resolv.conf
     dest: /etc/resolv.conf
     state: link
     force: true
-  when: has_systemd_resolved | bool
+  when:
+    - has_systemd_resolved | bool
+    - _resolv_conf_mountpoint.rc != 0
 
 - name: Setup dnsmasq for consul
   ansible.builtin.include_tasks: dnsmasq.yml
