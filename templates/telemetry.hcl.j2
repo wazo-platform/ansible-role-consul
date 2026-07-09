@@ -1,0 +1,12 @@
+# !!! MANAGED BY ANSIBLE !!!
+telemetry {
+{% for key, value in consul_telemetry.items() %}
+{% if value is boolean %}
+  {{ key }} = {{ value | bool | ternary('true', 'false') }}
+{% elif value is number %}
+  {{ key }} = {{ value }}
+{% else %}
+  {{ key }} = "{{ value }}"
+{% endif %}
+{% endfor %}
+}

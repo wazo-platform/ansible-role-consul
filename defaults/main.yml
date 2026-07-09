@@ -71,6 +71,11 @@ consul_join_wan: []                       # static WAN peers
 consul_cloud_autodiscovery: false
 consul_cloud_autodiscovery_string: ""     # e.g. "provider=aws tag_key=Service tag_value=consul addr_type=private_v4"
 
+consul_telemetry_enabled: false
+consul_telemetry:
+  disable_hostname: true
+  prometheus_retention_time: 60s
+
 consul_dnsmasq_consul_address: 127.0.0.1
 consul_dnsmasq_servers: []
 consul_dnsmasq_bind_interfaces: true

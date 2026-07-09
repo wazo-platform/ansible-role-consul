@@ -28,6 +28,16 @@ def test_files(host, path):
         assert item.contains("datacenter =")
 
 
+def test_telemetry_configured(host):
+    with host.sudo():
+        item = host.file("/etc/consul.d/telemetry.hcl")
+        assert item.exists
+        assert item.user == "consul"
+        assert item.group == "bin"
+        assert item.contains("telemetry {")
+        assert item.contains("prometheus_retention_time = ")
+
+
 def test_systemd_type_override(host):
     with host.sudo():
         item = host.file("/etc/systemd/system/consul.service.d/override.conf")
