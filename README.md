@@ -74,6 +74,7 @@ See [defaults/main.yml](defaults/main.yml) for the full list. Key variables:
 | `consul_performance` | `{leave_drain_time: 5s, raft_multiplier: 1, rpc_hold_timeout: 7s}` | Performance tuning block. |
 | `consul_enable_script_checks` | `false` | Allow script health checks. |
 | `consul_enable_local_script_checks` | `false` | Allow local script health checks. |
+| `consul_additional_checks` | `[]` | Additional standalone health checks, rendered to `checks.hcl`. Each item is a Consul check definition. |
 | `consul_encrypt_enable` | `false` | Enable gossip encryption (set `consul_raw_key`). |
 | `consul_raw_key` | `""` | Gossip encryption key (`consul keygen`); supply via vault. |
 | `consul_join` | `[]` | Static LAN peers (used when cloud autodiscovery is off). |

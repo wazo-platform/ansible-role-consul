@@ -10,6 +10,11 @@
     consul_version: "1.20.5-1"
     consul_node_role: server
     consul_telemetry_enabled: true
+    consul_additional_checks:
+      - id: molecule-http
+        name: Molecule HTTP check
+        http: http://localhost:8500/v1/status/leader
+        interval: 30s
 
   roles:
     - role: wazo.consul

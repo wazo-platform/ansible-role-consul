@@ -1,0 +1,21 @@
+{# !!! MANAGED BY ANSIBLE !!! #}
+{% macro hcl_value(value, indent) -%}
+{% if value is boolean -%}
+{{ value | bool | ternary('true', 'false') }}
+{%- elif value is number -%}
+{{ value }}
+{%- elif value is string -%}
+{{ value | to_json }}
+{%- elif value is mapping -%}
+{
+{% for k, v in value.items() %}{{ ' ' * (indent + 2) }}{{ k }} = {{ hcl_value(v, indent + 2) }}
+{% endfor %}{{ ' ' * indent }}}
+{%- else -%}
+{{ value | to_json }}
+{%- endif %}
+{%- endmacro -%}
+{% for check in consul_additional_checks %}
+check {
+{% for key, value in check.items() %}  {{ key }} = {{ hcl_value(value, 2) }}
+{% endfor %}}
+{% endfor %}
