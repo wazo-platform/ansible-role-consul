@@ -38,6 +38,17 @@ def test_telemetry_configured(host):
         assert item.contains("prometheus_retention_time = ")
 
 
+def test_additional_checks_configured(host):
+    with host.sudo():
+        item = host.file("/etc/consul.d/checks.hcl")
+        assert item.exists
+        assert item.user == "consul"
+        assert item.group == "bin"
+        assert item.contains("check {")
+        assert item.contains('id = "molecule-http"')
+        assert item.contains('http = "http://localhost:8500/v1/status/leader"')
+
+
 def test_systemd_type_override(host):
     with host.sudo():
         item = host.file("/etc/systemd/system/consul.service.d/override.conf")

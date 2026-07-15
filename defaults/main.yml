@@ -55,6 +55,14 @@ consul_performance:
 consul_enable_script_checks: false
 consul_enable_local_script_checks: false
 
+# Additional standalone health checks, rendered to checks.hcl. Each item is a
+# Consul check definition, e.g.
+#   - id: ntp
+#     name: NTP sync
+#     http: http://localhost:9000/health
+#     interval: 30s
+consul_additional_checks: []
+
 # Gossip encryption (supply consul_raw_key via vault to enable)
 consul_encrypt_enable: false
 consul_raw_key: ""                        # `consul keygen` output

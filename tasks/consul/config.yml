@@ -31,6 +31,16 @@
   when: consul_telemetry_enabled | bool
   notify: Restart consul
 
+- name: Configure additional consul checks
+  ansible.builtin.template:
+    src: checks.hcl.j2
+    dest: "{{ consul_config_dir }}/checks.hcl"
+    owner: "{{ consul_user }}"
+    group: "{{ consul_group }}"
+    mode: "0640"
+  when: consul_additional_checks | length > 0
+  notify: Restart consul
+
 - name: Create consul.service systemd override directory
   ansible.builtin.file:
     path: /etc/systemd/system/consul.service.d
