@@ -49,6 +49,17 @@ def test_additional_checks_configured(host):
         assert item.contains('http = "http://localhost:8500/v1/status/leader"')
 
 
+def test_additional_services_configured(host):
+    with host.sudo():
+        item = host.file("/etc/consul.d/services.hcl")
+        assert item.exists
+        assert item.user == "consul"
+        assert item.group == "bin"
+        assert item.contains("service {")
+        assert item.contains('id = "molecule-svc"')
+        assert item.contains('http = "http://localhost:8500/v1/status/leader"')
+
+
 def test_systemd_type_override(host):
     with host.sudo():
         item = host.file("/etc/systemd/system/consul.service.d/override.conf")

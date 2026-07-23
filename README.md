@@ -75,6 +75,7 @@ See [defaults/main.yml](defaults/main.yml) for the full list. Key variables:
 | `consul_enable_script_checks` | `false` | Allow script health checks. |
 | `consul_enable_local_script_checks` | `false` | Allow local script health checks. |
 | `consul_additional_checks` | `[]` | Additional standalone health checks, rendered to `checks.hcl`. Each item is a Consul check definition. |
+| `consul_additional_services` | `[]` | Additional services (with their checks), rendered to `services.hcl`. Each item is a Consul service definition. |
 | `consul_encrypt_enable` | `false` | Enable gossip encryption (set `consul_raw_key`). |
 | `consul_raw_key` | `""` | Gossip encryption key (`consul keygen`); supply via vault. |
 | `consul_join` | `[]` | Static LAN peers (used when cloud autodiscovery is off). |

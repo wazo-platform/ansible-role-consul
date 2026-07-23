@@ -1,0 +1,25 @@
+{# !!! MANAGED BY ANSIBLE !!! #}
+{% macro hcl_value(value, indent) -%}
+{% if value is boolean -%}
+{{ value | bool | ternary('true', 'false') }}
+{%- elif value is number -%}
+{{ value }}
+{%- elif value is string -%}
+{{ value | to_json }}
+{%- elif value is mapping -%}
+{
+{% for k, v in value.items() %}{{ ' ' * (indent + 2) }}{{ k }} = {{ hcl_value(v, indent + 2) }}
+{% endfor %}{{ ' ' * indent }}}
+{%- elif value is sequence -%}
+[
+{% for item in value %}{{ ' ' * (indent + 2) }}{{ hcl_value(item, indent + 2) }},
+{% endfor %}{{ ' ' * indent }}]
+{%- else -%}
+{{ value | to_json }}
+{%- endif %}
+{%- endmacro -%}
+{% for service in consul_additional_services %}
+service {
+{% for key, value in service.items() %}  {{ key }} = {{ hcl_value(value, 2) }}
+{% endfor %}}
+{% endfor %}
