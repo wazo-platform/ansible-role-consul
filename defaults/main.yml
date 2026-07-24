@@ -63,6 +63,18 @@ consul_enable_local_script_checks: false
 #     interval: 30s
 consul_additional_checks: []
 
+# Additional services (with their checks), rendered to services.hcl. Each item
+# is a Consul service definition, e.g.
+#   - id: ntp
+#     name: ntp
+#     port: 123
+#     checks:
+#       - id: ntp
+#         name: NTP sync
+#         http: http://localhost:9000/health
+#         interval: 30s
+consul_additional_services: []
+
 # Gossip encryption (supply consul_raw_key via vault to enable)
 consul_encrypt_enable: false
 consul_raw_key: ""                        # `consul keygen` output

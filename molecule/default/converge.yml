@@ -15,6 +15,15 @@
         name: Molecule HTTP check
         http: http://localhost:8500/v1/status/leader
         interval: 30s
+    consul_additional_services:
+      - id: molecule-svc
+        name: molecule-svc
+        port: 8500
+        checks:
+          - id: molecule-svc-http
+            name: Molecule service HTTP check
+            http: http://localhost:8500/v1/status/leader
+            interval: 30s
 
   roles:
     - role: wazo.consul
