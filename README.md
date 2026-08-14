@@ -44,10 +44,10 @@ at runtime — there is **no toggle** for it:
 - The [`wazo.metadata`](https://github.com/wazo-platform/ansible-role-metadata)
   role (a dependency) provides `metadata_owner` / `metadata_environment`, used by
   the `consul_datacenter` / `consul_domain` defaults.
-- The molecule test image is hosted on AWS ECR, so Docker must be authenticated against the registry before running `tox`. With the AWS CLI configured, run:
-```sh
-aws ecr get-login-password --region eu-west-1 | docker login --username AWS --password-stdin 119948825560.dkr.ecr.eu-west-1.amazonaws.com
-```
+- The molecule tests use the public
+  [`wazoplatform/systemd-debian`](https://hub.docker.com/r/wazoplatform/systemd-debian)
+  image (tags `11`, `12`, `13`), so no registry authentication is needed before
+  running `tox`.
 
 ## Role variables
 
