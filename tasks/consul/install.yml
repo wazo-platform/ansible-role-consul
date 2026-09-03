@@ -1,6 +1,6 @@
 ---
 # Install Consul from the official HashiCorp APT repository.
-# The repository supports Debian bullseye/bookworm/trixie and the package provides
+# Suites come from `consul_apt_suite`, not the distro release. The package provides
 # the binary (/usr/bin/consul), the consul user/group, /opt/consul, /etc/consul.d
 # and the consul.service systemd unit.
 
@@ -16,7 +16,7 @@
   ansible.builtin.apt_repository:
     repo: >-
       deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.asc]
-      https://apt.releases.hashicorp.com {{ ansible_facts['distribution_release'] }} main
+      https://apt.releases.hashicorp.com {{ consul_apt_suite | trim }} main
     filename: hashicorp
     state: present
     update_cache: true
