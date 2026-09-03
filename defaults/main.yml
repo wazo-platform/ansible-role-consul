@@ -11,6 +11,14 @@ consul_run_path: /run/consul       # TODO remove once all env rely on the apt pa
 consul_user: consul
 consul_group: bin                  # match the group used for consul.d files
 
+# HashiCorp drops EOL suites from apt.releases.hashicorp.com; redirect them to
+# the closest published one. Unlisted releases use their own name.
+consul_apt_suite_map:
+  bullseye: bookworm
+consul_apt_suite: >-
+  {{ consul_apt_suite_map.get(ansible_facts['distribution_release'],
+                              ansible_facts['distribution_release']) }}
+
 consul_datacenter: "{{ metadata_owner }}-{{ metadata_environment }}"
 consul_domain: "{{ metadata_environment }}.{{ metadata_owner }}"
 consul_disable_update_check: true
