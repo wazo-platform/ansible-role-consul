@@ -11,7 +11,7 @@ pipeline {
 
     stage ('Lint') {
       agent {
-        label 'molecule-aws-debian13-small'
+        label 'molecule-arm64-debian13-small'
       }
       steps {
         script { checkout scm }
@@ -28,7 +28,7 @@ pipeline {
       parallel {
         stage ('Debian 11 / Ansible 8') {
           agent {
-            label 'molecule-aws-debian12-small'
+            label 'molecule-arm64-debian12-small'
           }
           steps {
             script { checkout scm }
@@ -43,7 +43,7 @@ pipeline {
 
         stage ('Debian 12 / Ansible 8') {
           agent {
-            label 'molecule-aws-debian12-small'
+            label 'molecule-arm64-debian12-small'
           }
           steps {
             script { checkout scm }
@@ -58,7 +58,7 @@ pipeline {
 
         stage ('Debian 13 / Ansible 13') {
           agent {
-            label 'molecule-aws-debian13-small'
+            label 'molecule-arm64-debian13-small'
           }
           steps {
             script { checkout scm }
